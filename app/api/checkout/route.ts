@@ -1,14 +1,10 @@
 export const dynamic = 'force-dynamic'
 
 import { NextResponse } from 'next/server'
-import Stripe from 'stripe'
-
-type PlanId = 'solo' | 'business' | 'multi'
+import { stripe, type PlanId } from '@/lib/stripe'
 
 export async function POST(req: Request) {
   console.log('Stripe key exists:', !!process.env.STRIPE_SECRET_KEY)
-
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
   const PRICE_IDS: Record<PlanId, string | undefined> = {
     solo: process.env.STRIPE_PRICE_SOLO,
