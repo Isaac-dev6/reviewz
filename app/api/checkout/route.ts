@@ -3,13 +3,17 @@ export const dynamic = 'force-dynamic'
 import { NextResponse } from 'next/server'
 import { stripe, type PlanId } from '@/lib/stripe'
 
-const PRICE_IDS: Record<PlanId, string | undefined> = {
-  solo: process.env.STRIPE_PRICE_SOLO,
-  business: process.env.STRIPE_PRICE_BUSINESS,
-  multi: process.env.STRIPE_PRICE_MULTI,
-}
-
 export async function POST(req: Request) {
+  console.log('Stripe key exists:', !!process.env.STRIPE_SECRET_KEY)
+
+  const PRICE_IDS: Record<PlanId, string | undefined> = {
+    solo: process.env.STRIPE_PRICE_SOLO,
+    business: process.env.STRIPE_PRICE_BUSINESS,
+    multi: process.env.STRIPE_PRICE_MULTI,
+  }
+
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
+
   try {
     const body = (await req.json().catch(() => ({}))) as { plan?: string }
     const plan = body.plan as PlanId | undefined
@@ -35,8 +39,8 @@ export async function POST(req: Request) {
       allow_promotion_codes: true,
       billing_address_collection: 'auto',
       locale: 'fr',
-      success_url: 'http://localhost:3000/dashboard',
-      cancel_url: 'http://localhost:3000/paiement',
+      success_url: `${baseUrl}/dashboard`,
+      cancel_url: `${baseUrl}/paiement`,
     })
 
     return NextResponse.json({ url: session.url })
